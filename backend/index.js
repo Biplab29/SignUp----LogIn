@@ -10,7 +10,7 @@ const Salt = 10;
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({origin : 'http://localhost:4200'}));
 app.use(cookieParser());
 
 // Database Connection
