@@ -16,16 +16,16 @@ const Home = () => {
         if (res.data.Status === "Success") {
           setAuth(true);
           setName(res.data.name);
-          setMessage(""); // Clear message on successful login
+          setMessage(""); 
         } else {
           setAuth(false);
-          setMessage("You are not logged in."); // Set message if not logged in
+          setMessage("You are not logged in."); 
         }
       })
       .catch(err => {
         console.log(err);
         setAuth(false);
-        setMessage("An error occurred while checking authentication.");
+        setMessage("You Need to Login Now");
       });
   }, []);
 
@@ -36,7 +36,7 @@ const Home = () => {
           setAuth(false);
           setName("");
           setMessage("You are not logged in."); 
-          navigate("/login"); 
+          navigate("/"); 
         }
       })
       .catch(err => console.log(err));
@@ -45,16 +45,20 @@ const Home = () => {
   return (
     <div className="container mt-4">
       {auth ? (
-        <div>
-          <h3>You are successfully logged in, {name}</h3>
-          <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
-        </div>
+      <div className="d-flex flex-column justify-content-center align-items-center" style={{ height: "100vh" }}>
+      <h3>You are successfully logged in, {name}</h3>
+      <button className="btn btn-danger mt-3" onClick={handleLogout}>Logout</button>
+    </div>
+    
       ) : (
-        <div>
-          <h3>{message}</h3>
-          <h3>Login Now</h3>
+        <div className="container d-flex justify-content-center align-items-center mt-4" style={{ height: "100vh" }}>
+        <div className="text-center">
+          <h3>{message}</h3> <br /><br />
+          <h3>Login</h3>
           <Link to="/login" className="btn btn-primary">Login</Link>
         </div>
+      </div>
+      
       )}
     </div>
   );
