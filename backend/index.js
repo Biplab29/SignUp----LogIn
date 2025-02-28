@@ -1,88 +1,75 @@
 const express = require('express');
-const mysql = require("mysql");
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const cookieParser = require("cookie-parser");
+const RegiRouter = require("./routes/Register");
+const LoginRouter = require("./routes/Login"); 
+const authRouter = require("./routes/Home");
+const cookieParser = require('cookie-parser');
+
+require('dotenv').config(); 
 
 const app = express();
-const Salt = 10;
 
-// Middleware
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors({origin : 'http://localhost:4200'}));
+app.use(cors({
+    origin: ["http://localhost:5173"],
+    methods: ["GET", "POST"],
+    credentials: true
+}));
+
 app.use(cookieParser());
 
-// Database Connection
-const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "signUp"
+app.use("/", RegiRouter);
+app.use("/", LoginRouter);
+app.use("/", authRouter);
+
+app.get("/logout", (req, res) => {
+    res.clearCookie('token');
+    return res.json({ Status: "Success" });
 });
 
-db.connect((err) => {
-    if (err) {
-        console.error("Database Connection Failed: ", err);
-    } else {
-        console.log("Database Connected");
-    }
+const PORT_NO = 8080;
+app.listen(PORT_NO, () => {
+    console.log(`Server is Running on port ${PORT_NO}...`);
 });
 
-// Register Route
-app.post('/register', (req, res) => {
-    const sql = "INSERT INTO login (`Name`, `Email`, `password`) VALUES (?)";
-    
-    bcrypt.hash(req.body.password, Salt, (err, hash) => {
-        if (err) {
-            return res.status(500).json({ error: "Error hashing password" });
-        }
 
-        const values = [
-            req.body.Name,
-            req.body.Email,
-            hash
-        ];
 
-        db.query(sql, [values], (err, result) => {
-            if (err) {
-                console.error("Database Insert Error:", err);
-                return res.status(500).json({ error: "Error inserting data" });
-            }
 
-            return res.json({ Status: "Success" });
-        });
-    });
-});
 
-//login route
-app.post("/login",(req,res) =>{
-    const sql = "SELECT * FROM login WHERE Email = ?";
+// const express = require('express');
+// const cors = require("cors");
+// const RegiRouter = require("./routes/Register");
+// const LoginRouter = require("./routes/Login"); 
+// const authRouter = require("./routes/Home");
+// const cookieParser = require('cookie-parser');
 
-    db.query(sql, [req.body.Email], (err, result) => {  
-        if (err) {
-            return res.status(500).json({ Error: "Login Error in Server" });
-        }
+// require('dotenv').config(); 
 
-        if (result.length > 0) {
-            bcrypt.compare(req.body.password.toString(), result[0].password, (err, match) => { 
-                if (err) {
-                    return res.status(500).json({ Error: "Password Compare Error" });
-                }
+// const app = express();
 
-                if (match) {
-                    return res.json({ Status: "Success" }); 
-                } else {
-                    return res.json({ Error: "Password Not Match" });
-                }
-            });
-        } else {
-            return res.json({ Error: "No Email Existed" });
-        }
-    });
-});
+// app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());
+// app.use(cors({
+//     origin: ["http://localhost:5173"],
+//     methods: ["GET", "POST"],
+//     credentials: true
+// }));
 
-// Start Server
-app.listen(8081, () => {
-    console.log(" Server is Running on port 8080...");
-});
+
+// app.use(cookieParser());
+
+
+// app.use("/", RegiRouter);
+// app.use("/", LoginRouter);
+// app.use("/", authRouter);
+
+// app.get("/logout",(req , res) =>{
+//     res.clearCookie('token');
+//     return res.json({Status: "Success"});
+// });
+
+// const PORT_NO = 8080;
+// app.listen(PORT_NO, () => {
+//     console.log(`Server is Running on port ${PORT_NO}...`);
+// });
